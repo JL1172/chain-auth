@@ -18,12 +18,17 @@ export class AuthenticationController {
     }
   }
   @Get('/generate-register-code/:id')
-  public sendCode(@Param('id') id: number): number | string | void {
+  public async sendCode(@Param('id') id: number) {
     try {
-      return this.jwt.generateRegistrationJwt(
+      //build token
+      const jwt_token = this.jwt.generateRegistrationJwt(
         ExpDate.FIFTEEN_MINUTES,
         Number(id),
       );
+      //grab expiration date
+      const exp_date = await this.jwt.getExpDate(jwt_token);
+      return exp_date;
+
     } catch (err) {
       this.error.report(
         'Something unexpected occurred, retry.',
