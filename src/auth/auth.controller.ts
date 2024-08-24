@@ -33,10 +33,22 @@ export class AuthenticationController {
       ).exp;
       const date_to_insert = new Date(exp_date * 1000);
 
+      //validating token is not already in data base
+      const isTokenNotUnique =
+        await this.prisma.findRegistrationToken(jwt_token);
+      if (isTokenNotUnique) {
+        this.error.report(
+          'Token Already Exists. Try Again Later.',
+          HttpStatus.BAD_REQUEST,
+        );
+        //todo need to process this error better lol
+        //todo may need to just replace token or whatever
+        //todo dont know implications of duplicate token lol
+      }
+
       //payload
       const payload = { token: jwt_token, expiration_date: date_to_insert };
-      await this.prisma.addRegistrationToken(payload);
-      
+      return (await this.prisma.addRegistrationToken(payload)).token;
     } catch (err) {
       this.error.report(
         'Something unexpected occurred, retry.',
