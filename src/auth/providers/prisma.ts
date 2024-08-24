@@ -9,6 +9,6 @@ export class AuthPrismaProvider {
     this.prisma = SingletonPrisma.getInstance();
   }
   public async addRegistrationToken(jwt: string) {
-    // return await this.prisma.registrationToken.create({data})
+    return await this.prisma.registrationToken.create({data: jwt})
   }
 }

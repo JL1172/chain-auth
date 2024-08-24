@@ -6,7 +6,7 @@ export enum ExpDate {
   FIFTEEN_MINUTES = '15m',
 }
 
-type DecodedType = {
+export type DecodedType = {
   company_id: number;
   exp: number;
   iat: number;
@@ -28,8 +28,8 @@ export class JwtProvider {
     return this.jwt.sign(payload, process.env.JWT_SECRET, options);
   }
 
-  public async getExpDate(token: string) {
-    const decoded: DecodedType | void = await new Promise((resolve, reject) => {
+  public async getExpDate(token: string): Promise<DecodedType> {
+    const decoded: DecodedType = await new Promise((resolve, reject) => {
       this.jwt.verify(
         token,
         process.env.JWT_SECRET,

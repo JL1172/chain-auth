@@ -1,6 +1,6 @@
 import { Controller, Get, HttpStatus, Param, Query } from '@nestjs/common';
 import { ErrorHandler } from './providers/error';
-import { ExpDate, JwtProvider } from './providers/jtw';
+import { DecodedType, ExpDate, JwtProvider } from './providers/jtw';
 
 @Controller('auth')
 export class AuthenticationController {
@@ -26,9 +26,12 @@ export class AuthenticationController {
         Number(id),
       );
       //grab expiration date
-      const exp_date = await this.jwt.getExpDate(jwt_token);
-      return exp_date;
+      const exp_date: DecodedType['exp'] = (
+        await this.jwt.getExpDate(jwt_token)
+      ).exp;
+      const date_to_insert = new Date(exp_date * 1000);
 
+      //
     } catch (err) {
       this.error.report(
         'Something unexpected occurred, retry.',

@@ -67,6 +67,6 @@ model BlacklistedUser {
 model RegistrationToken {
   id              Int       @id @default(autoincrement())
   token           String    @unique
-  expiration_date DateTime?
+  expiration_date DateTime
   created_at      DateTime? @default(now())
 }
