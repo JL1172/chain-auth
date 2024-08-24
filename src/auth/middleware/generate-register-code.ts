@@ -1,6 +1,7 @@
 import { HttpStatus, Injectable, NestMiddleware } from '@nestjs/common';
 import { NextFunction, Request, Response } from 'express';
 import { ErrorHandler } from '../providers/error';
+import { AuthPrismaProvider } from '../providers/prisma';
 
 @Injectable()
 export class ParseNumber implements NestMiddleware {
@@ -11,6 +12,26 @@ export class ParseNumber implements NestMiddleware {
     }
     if (!isFinite(Number(req.params.id))) {
       this.error.report('Parameter Id Must Be Finite.', HttpStatus.BAD_REQUEST);
+    }
+    next();
+  }
+}
+
+@Injectable()
+export class ValidateCompanyExists implements NestMiddleware {
+  constructor(
+    private readonly prisma: AuthPrismaProvider,
+    private readonly error: ErrorHandler,
+  ) {}
+  async use(req: Request, res: Response, next: NextFunction) {
+    const isValidCompany = await this.prisma.findCompanyWithId(
+      Number(req.params.id),
+    );
+    if (!isValidCompany) {
+      this.error.report(
+        `Company with id: ${req.params.id} does not exist.`,
+        HttpStatus.BAD_REQUEST,
+      );
     }
     next();
   }

@@ -20,6 +20,7 @@ export class AuthenticationController {
     }
   }
   @Get('/generate-register-code/:id')
+  //todo need to add middleware to validate company with id exists
   public async sendCode(@Param('id') id: number) {
     try {
       //build token

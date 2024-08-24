@@ -19,4 +19,7 @@ export class AuthPrismaProvider {
   }) {
     return await this.prisma.registrationToken.create({ data: jwt });
   }
+  public async findCompanyWithId(id: number) {
+    return await this.prisma.company.findUnique({ where: { id } });
+  }
 }

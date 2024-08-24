@@ -2,7 +2,10 @@ import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { AuthenticationController } from './auth.controller';
 import { ErrorHandler } from './providers/error';
 import { JwtProvider } from './providers/jtw';
-import { ParseNumber } from './middleware/generate-register-code';
+import {
+  ParseNumber,
+  ValidateCompanyExists,
+} from './middleware/generate-register-code';
 import { AuthPrismaProvider } from './providers/prisma';
 
 @Module({
@@ -12,6 +15,8 @@ import { AuthPrismaProvider } from './providers/prisma';
 })
 export class AuthenticationModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(ParseNumber).forRoutes('/auth/generate-register-code/:id');
+    consumer
+      .apply(ParseNumber, ValidateCompanyExists)
+      .forRoutes('/auth/generate-register-code/:id');
   }
 }
