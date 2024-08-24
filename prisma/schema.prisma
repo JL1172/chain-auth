@@ -25,7 +25,7 @@ model User {
   company_id Int
   company    Company   @relation(fields: [company_id], references: [id])
 
-  blacklisted_list BlacklistedUser[] 
+  blacklisted_list BlacklistedUser[]
   //need to evaluate who is blacklisting the user, if they are blacklisted, but it they are signing in with a company that hasnt blacklisted them, then they are good
 
   @@unique([company_id, email])
@@ -62,4 +62,11 @@ model BlacklistedUser {
   updated_at DateTime? @updatedAt()
 
   @@unique([company_id, user_id])
+}
+
+model RegistrationToken {
+  id              Int       @id @default(autoincrement())
+  token           String    @unique
+  expiration_date DateTime?
+  created_at      DateTime? @default(now())
 }
