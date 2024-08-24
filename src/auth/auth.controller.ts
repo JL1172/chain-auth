@@ -1,12 +1,14 @@
 import { Controller, Get, HttpStatus, Param, Query } from '@nestjs/common';
 import { ErrorHandler } from './providers/error';
 import { DecodedType, ExpDate, JwtProvider } from './providers/jtw';
+import { AuthPrismaProvider } from './providers/prisma';
 
 @Controller('auth')
 export class AuthenticationController {
   constructor(
     private readonly error: ErrorHandler,
     private readonly jwt: JwtProvider,
+    private readonly prisma: AuthPrismaProvider,
   ) {}
   @Get('/chain-auth')
   public sanity(@Query('err') err: string): string | void {
@@ -31,7 +33,10 @@ export class AuthenticationController {
       ).exp;
       const date_to_insert = new Date(exp_date * 1000);
 
-      //
+      //payload
+      const payload = { token: jwt_token, expiration_date: date_to_insert };
+      await this.prisma.addRegistrationToken(payload);
+      
     } catch (err) {
       this.error.report(
         'Something unexpected occurred, retry.',
