@@ -20,7 +20,6 @@ export class AuthenticationController {
     }
   }
   @Get('/generate-register-code/:id')
-  //todo need to add middleware to validate company with id exists
   public async sendCode(@Param('id') id: number) {
     try {
       //build token
@@ -34,7 +33,7 @@ export class AuthenticationController {
       ).exp;
       const date_to_insert = new Date(exp_date * 1000);
 
-      //validating token is not already in data base
+      //validating token is not already in data base //if it is swap
       const isTokenNotUnique =
         await this.prisma.findRegistrationToken(jwt_token);
       if (isTokenNotUnique) {
@@ -42,6 +41,12 @@ export class AuthenticationController {
           'Token Already Exists. Try Again Later.',
           HttpStatus.BAD_REQUEST,
         );
+        //todo first todo:
+        //!if token exists, swap tokens. need to evaluate the best way to go about this tbh. this needs to be better. idek. just need to eval logic better than:
+        //* 1. assign jwt to user to direct what auth path user is taking. need this because this is a third party auth and can be used widely. 
+        //* 2. the endpoint is hit, then it looks up company id, then returns jwt with that token that has a 15 minute time on it. if it expires, session expires. 
+        //* 3. the endpoint validates the company id exists, is a number, and is in safe signed 64 bit range.
+        //* 4. then the endpoint returns with jwt specifying auth route. i dont think i need to add it to db
         //todo need to process this error better lol
         //todo may need to just replace token or whatever
         //todo dont know implications of duplicate token lol

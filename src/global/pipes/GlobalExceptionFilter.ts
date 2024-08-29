@@ -1,6 +1,12 @@
-import { ArgumentsHost, Catch, ExceptionFilter, Logger } from '@nestjs/common';
+import {
+  ArgumentsHost,
+  Catch,
+  ExceptionFilter,
+  HttpException,
+  Logger,
+} from '@nestjs/common';
 import { Request, Response } from 'express';
-
+//todo this would be a good place to gather crash analytics
 @Catch()
 export class GlobalExceptionFilter implements ExceptionFilter {
   private readonly logger: Logger = new Logger(GlobalExceptionFilter.name);
@@ -8,10 +14,16 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     const ctx = host.switchToHttp();
     const res = ctx.getResponse<Response>();
     const req = ctx.getRequest<Request>();
-    const status = exception.status;
+    let status = exception.status;
     const exception_type = exception.name;
-    const message =
-      exception?.getResponse() || 'An Unexpected Problem Occurred';
+    let message;
+    if (exception instanceof HttpException) {
+      message = exception.getResponse();
+    } else {
+      message =
+        'An unexpected problem occurred, if this problem persists, please submit a ticket.';
+      status = 500;
+    }
     const timestamp = new Date().toISOString();
     const { baseUrl, method } = req;
     this.logger.error(

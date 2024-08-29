@@ -13,6 +13,14 @@ export class ParseNumber implements NestMiddleware {
     if (!isFinite(Number(req.params.id))) {
       this.error.report('Parameter Id Must Be Finite.', HttpStatus.BAD_REQUEST);
     }
+    if (
+      Number(req.params.id) < Number.MIN_SAFE_INTEGER ||
+      Number(req.params.id) > Number.MAX_SAFE_INTEGER
+    ) {
+      this.error.report(
+        `Paramter Id Must Be ${Number(req.params.id) < Number.MIN_SAFE_INTEGER ? 'Greater than -2^63' : 'Less than 2^63'}`,
+      );
+    }
     next();
   }
 }
