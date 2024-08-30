@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 
 @Injectable()
-export class ErrorHandler {
+export class AuthErrorHandler {
   public report(
     err: string | Record<string, any>,
     status: HttpStatus = HttpStatus.INTERNAL_SERVER_ERROR,

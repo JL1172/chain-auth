@@ -1,22 +1,22 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { AuthenticationController } from './auth.controller';
-import { ErrorHandler } from './providers/error';
+import { AuthErrorHandler } from './providers/error';
 import { JwtProvider } from './providers/jtw';
-import {
-  ParseNumber,
-  ValidateCompanyExists,
-} from './middleware/generate-register-code';
 import { AuthPrismaProvider } from './providers/prisma';
-
+import {
+  RateLimit,
+  ValidateIpIsNotBlacklisted,
+} from './middleware/register-one';
+import { Delay } from './providers/delay';
 @Module({
   imports: [],
   controllers: [AuthenticationController],
-  providers: [ErrorHandler, JwtProvider, AuthPrismaProvider],
+  providers: [AuthErrorHandler, JwtProvider, AuthPrismaProvider, Delay],
 })
 export class AuthenticationModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
-      .apply(ParseNumber, ValidateCompanyExists)
-      .forRoutes('/auth/generate-register-code/:id');
+      .apply(RateLimit, ValidateIpIsNotBlacklisted)
+      .forRoutes('/auth/register-one');
   }
 }

@@ -7,66 +7,30 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-//* eventually need to add field where i make a 1-n relationship between user and company
-//* where company registered with auth service can have one service, and each user can be registered with many different companies
-//* for current function, just user field is sufficient for testing
-
 model User {
+  id             Int       @id @default(autoincrement())
+  first_name     String
+  last_name      String
+  email          String    @unique
+  username       String    @unique
+  password       String
+  age            Int
+  dob            DateTime
+  created_at     DateTime? @default(now())
+  updated_at     DateTime? @updatedAt()
+  blacklisted    Boolean
+  email_verified Boolean
+}
+
+model WatchListedIp {
   id         Int       @id @default(autoincrement())
-  first_name String
-  last_name  String
-  email      String
-  username   String
-  password   String
-  age        Int
-  dob        DateTime
+  ip_address String
+  violations Int
   created_at DateTime? @default(now())
-  updated_at DateTime? @updatedAt()
-  company_id Int
-  company    Company   @relation(fields: [company_id], references: [id])
-
-  blacklisted_list BlacklistedUser[]
-  //need to evaluate who is blacklisting the user, if they are blacklisted, but it they are signing in with a company that hasnt blacklisted them, then they are good
-
-  @@unique([company_id, email])
-  @@unique([company_id, username])
 }
 
-model Company {
-  id                  Int               @id @default(autoincrement())
-  name                String
-  password            String
-  username            String            @unique
-  email               String            @unique
-  user                User[]
-  //more information needed later 
-  blacklistedUserList BlacklistedUser[]
-  created_at          DateTime?         @default(now())
-  updated_at          DateTime?         @updatedAt()
-}
-
-model BlacklistedJwt {
-  id              Int       @id @default(autoincrement())
-  token           String
-  expiration_date DateTime
-  created_at      DateTime? @default(now())
-}
-
-model BlacklistedUser {
+model BlacklistedIp {
   id         Int       @id @default(autoincrement())
-  user_id    Int
-  user       User      @relation(fields: [user_id], references: [id])
-  company_id Int
-  company    Company   @relation(fields: [company_id], references: [id])
+  ip_address String
   created_at DateTime? @default(now())
-  updated_at DateTime? @updatedAt()
-
-  @@unique([company_id, user_id])
-}
-
-model RegistrationToken {
-  id              Int       @id @default(autoincrement())
-  token           String    @unique
-  expiration_date DateTime
-  created_at      DateTime? @default(now())
 }
